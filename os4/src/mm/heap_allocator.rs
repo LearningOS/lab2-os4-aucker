@@ -1,10 +1,11 @@
 //! The global allocator
 
+// kernel heap size
 use crate::config::KERNEL_HEAP_SIZE;
 use buddy_system_allocator::LockedHeap;
 
 #[global_allocator]
-/// heap allocator instance
+/// buddy heap allocator instance, inner mutex, Mutex<T>(跨线程RefCell？)
 static HEAP_ALLOCATOR: LockedHeap = LockedHeap::empty();
 
 #[alloc_error_handler]
