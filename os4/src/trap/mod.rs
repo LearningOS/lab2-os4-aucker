@@ -87,13 +87,17 @@ pub fn trap_handler() -> ! {
 
 #[no_mangle]
 pub fn trap_return() -> ! {
+    // from S to U, set `stvec` register `trap` process addr as springboard adr
     set_user_trap_entry();
+    // prepare two params that __restore needs:
     let trap_cx_ptr = TRAP_CONTEXT;
     let user_satp = current_user_token();
     extern "C" {
         fn __alltraps();
         fn __restore();
     }
+
+    // calculate virtual addr of __restore
     let restore_va = __restore as usize - __alltraps as usize + TRAMPOLINE;
     unsafe {
         core::arch::asm!(

@@ -53,12 +53,17 @@ struct TaskManagerInner {
 
 lazy_static! {
     /// a `TaskManager` instance through lazy_static!
+    /// rust_main invoke run_first_task
     pub static ref TASK_MANAGER: TaskManager = {
         info!("init TASK_MANAGER");
+        // get the app number
         let num_app = get_num_app();
         info!("num_app = {}", num_app);
+        // get a new task control block empty vector
         let mut tasks: Vec<TaskControlBlock> = Vec::new();
+        // get each apps ELF data
         for i in 0..num_app {
+            // new tasks for each apps, get each tasks control block
             tasks.push(TaskControlBlock::new(get_app_data(i), i));
         }
         TaskManager {
@@ -155,12 +160,14 @@ impl TaskManager {
         }
     }
 
+    // add the sys call count
     fn update_syscall_times(&self, syscall_id: usize) {
         let mut inner = self.inner.exclusive_access();
         let current = inner.current_task;
         inner.tasks[current].task_syscall_times[syscall_id] += 1;
     }
 
+    // get the curr app task info
     fn get_task_info(&self) -> TaskInfo {
         let inner = self.inner.exclusive_access();
         let current = inner.current_task;
@@ -175,7 +182,7 @@ impl TaskManager {
     fn mmap_in_current_memory_set(&self, start: usize, len: usize, port: usize) -> isize {
         let mut inner = self.inner.exclusive_access();
         let current_task = inner.current_task;
-        inner.tasks[current_task].memory_set.munmap(start, len)
+        inner.tasks[current_task].memory_set.mmap(start, len, port)
     }
 
     fn munmap_in_current_memory_set(&self, start: usize, len: usize) -> isize {

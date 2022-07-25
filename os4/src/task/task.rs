@@ -13,7 +13,7 @@ pub struct TaskControlBlock {
     pub trap_cx_ppn: PhysPageNum,
     pub base_size: usize,
 
-    pub task_syscall_times: [u32; MAX_SYSCALL_NUM],
+    pub task_syscall_times: [u32; MAX_SYSCALL_NUM], // syscall times
     pub task_first_running_time: Option<usize>, // first time when the task was scheduled
 }
 
